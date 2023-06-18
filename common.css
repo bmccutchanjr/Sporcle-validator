@@ -40,8 +40,30 @@ main
 
 main > section
 {
-	border: 1px black solid;
+	text-align: left;
 	width: 45%;
+}
+
+main > section:last-child
+{
+	text-align: right;
+}
+
+main > section > div
+{
+	margin-bottom: 8px;
+}
+
+#word-input.error-message
+{
+	border-color: red;
+	color: red
+}
+
+.error-message
+{
+	color: red;
+	height: 14px;
 }
 
 /*                                         */

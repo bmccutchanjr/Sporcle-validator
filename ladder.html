@@ -13,8 +13,19 @@
 	<div id="wrapper">
 		<header></header>
 		<main>
-			<section></section>
-			<section></section>
+			<section>
+				<div>
+					<input id="word-input" name="word-input" placeholder="Enter a word" onfocus="this.select(all);">
+					<button id="add-word">Add</button>
+				</div>
+				<div class="error-message"></div>
+				<div>
+					<p>This is a simple application designed to validate "word ladder" puzzles.</p>
+					<p>A word ladder is a type of word puzzle made up of a series of words, called 'rungs'.  Each word varies from the immediately preceeding word by one, and ony one, letter.  For example feed → feel.  The words in the ladder can be almost any length (minimum length of 3 letters) but they must all be the same length.  There may be any number of words in the ladder.</p>
+					<p>This page checks for word length, duplicate words, missing rungs (more than one letter changed in a single word pair) and 'bungs'.  Bungs are word triplets where the same letter is changed; for example feed → feel → feet.  Bungs are allowed, but unnecessary, and are considered bad form.</p>
+				</div>
+			</section>
+			<section id="ladder-section"></section>
 		</main>
 		<div id="push"></div>
 	</div>
