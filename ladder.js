@@ -9,6 +9,12 @@ window.addEventListener ("load", event =>
 	//	Events associated with the selection of delimiters
 	document.getElementById("delimiter-wrapper").addEventListener ("change", event => { delimiterChangeHandler(event) } );
 	document.getElementById("import-ladder").addEventListener ("change", event => { textareaEventHandler(event) } );
+//	This doesn't do what I thought it did...I want an event that is triggered when something is pasted into an 
+//	element
+//		document.getElementById("import-ladder").addEventListener ("paste", event => { textareaEventHandler(event) } );
+//		document.getElementById("import-ladder").addEventListener ("paste", event => { document.getElementById("import-ladder").change (event) } );
+//	Both of the above prevent the data being pasted into the textarea, rather than detecting the event and alloing me to
+//	execute the change handler.
 //	document.getElementById("import-ladder").addEventListener ("blur", event =>
 	document.getElementById("import-ladder").addEventListener ("focus", event => { textareaFocusHandler (event) } );
 
@@ -44,22 +50,6 @@ function helpClickHandler ()
 	displayElement (document.getElementById ("about-wrapper"));
 }
 
-function displayElement (e)
-{	//	Alter the element's classList to make the element visible.  Remove class 'hide' and add class 'display'.
-
-//		e.classList.remove ("hide");
-//		e.classList.add ("display");
-e.classList.remove ("hidden");
-}
-
-function hideElement (e)
-{	//	Alter the element's classList to hide the element.  Remove class 'display' and add class 'hide'.
-
-//		e.classList.remove ("display");
-//		e.classList.add ("hide");
-e.classList.add ("hidden");
-}
-
 function closePopUp ()
 {	//	Close (hide) the pop-up window
 	//
@@ -71,6 +61,7 @@ function closePopUp ()
 	hideElement (document.getElementById ("use-div"));
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	Event handlers and associated functions for the <textarea> and radio <input> elements.  These events are primarilly
@@ -80,7 +71,8 @@ function closePopUp ()
 //	without them.
 
 function textareaEventHandler (event)
-{	event.preventDefault();
+{
+	// event.preventDefault();
 	const target = event.target;
 
 	//	A change has made to the textarea.  This function detects whether there is data in the textarea and modifies
@@ -137,6 +129,8 @@ function textareaEventHandler (event)
 		hideOtherInput (false);
 		enableImportButton (false);
 	}
+
+	document.getElementById ("import-button").focus( { focusVisible: true } );
 }
 
 function findChar (data, delimiter)
@@ -233,7 +227,6 @@ function importClickHandler (event)
 
 	//	The import button was clicked, several things need to happen.
 
-	//	Hide the import-section and display ladder-section
 	hideElement (document.getElementById ("import-section"));
 	displayElement (document.getElementById ("ladder-section"));
 
@@ -241,6 +234,7 @@ function importClickHandler (event)
 	//
 	//	Convert the input to an array, create DOM elements to display each rung, validate the entries and display
 	//	appropriate messages.
+
 	const ladder = document.getElementById ("import-ladder").value.split (findDelimiter());
 	ladder.forEach ((l, i) =>
 	{
@@ -260,34 +254,38 @@ function importClickHandler (event)
 	})
 }
 
-function createRung (rung, index)
+function createRung (value, index)
 {	//	Add a rung to the ladder.  The steps of an actual ladder are called rungs and the terminology has stuck for
 	//	word ladders.  Each word in a word ladder is called a 'rung'.
 	//
 	//	This function creates a <div> that contains two read only <input>.  One to display the rung and one to display
 	//	optional messages that may be generated later.
 
-	getLadder().append (div);
-
-	const div = document.createElement ("div");
+	const rung = document.createElement ("div");
+	rung.classList.add ("rung");
+	getLadder().append (rung);
 
 	const number = document.createElement ("input");
 	number.classList.add ("number");
 	number.setAttribute ("id", "number");
 	number.setAttribute ("readonly", true);
 	number.value = index;
-	div.append (number);
+	rung.append (number);
 
 	const word = document.createElement ("input");
 	word.classList.add ("word");
 	word.setAttribute ("id", "word");
 	word.setAttribute ("readonly", true);
-	word.value = rung;
-	div.append (word);
+	word.value = value;
+	rung.append (word);
 
 	const message = document.createElement ("input")
+	message.classList.add ("message");
 	message.setAttribute ("id", "message");
-	div.append (message);
+	message.setAttribute ("readonly", true);
+	rung.append (message);
+
+	return rung;
 }
 
 function validateRung (ladder, rung, index)
@@ -298,27 +296,23 @@ function validateRung (ladder, rung, index)
 	//	understand.  Some errors may go undetected, but it isn't necessary to find every one, one error anywhere in the
 	//	ladder invalidates the whole ladder.
 
-// //	There is nothing to compare the first rung of the ladder to.
-
-// if (index == 0) return;
-
 	//	All rungs in the ladder must be the same length.  I need a standard, and I choose the first rung of the ladder.
 	//	It's a completely arbitrary decision.
 
-	if (a.length < ladder[0].length)
-	{	errorMessage (rung, "This rung is too short");
+	if (ladder[index].length < ladder[0].length)
+	{	errorMessage (rung, "This word is too short");
 		return;
 	}
 
-	if (a.length > ladder[0].length)
-	{	errorMessage (rung, "This rung is too long");
+	if (ladder[index].length > ladder[0].length)
+	{	errorMessage (rung, "This word is too long");
 		return;
 	}
 
 	//	Each rung in the ladder must differ from the previous rung by one, and only one, letter; e.g.; 'fish' amd 'wish'.
 	//	Compare this rung to the rung immediately above it.
 
-	const count = countChangedLetters (i);
+	const count = countChanges (ladder, index);
 
 	if (count == 0)
 	{
@@ -334,9 +328,9 @@ function validateRung (ladder, rung, index)
 
 	//	The same word should not be used more than once.
 
-	if (findDuplicates (i))
+	if (findDuplicates (ladder, index))
 	{
-		errorMessage (rung, "This word has been used previously");
+		errorMessage (rung, "This word has been used already.");
 		return;
 	}
 
@@ -345,301 +339,88 @@ function validateRung (ladder, rung, index)
 	//	'then', 'than' and 'thin' is not.  The change is in the third letter each time.  This is called a 'bung' and it's
 	//	frowned upon.  Although it doesn't invalidate the ladder, the middle word can be eliminated without affecting it.
 
-	if (findBungs (i))
-	{	//	Unlike other error messages, this message should go on the previous rung.
+	if (index > 1)
+	{	//	Bungs involve a minimum of three consequetive words, so the earliest a bung can appear in a ladder is the
+		//	third rung (index = 2).
 
+		//	Bungs are a special case.  The actual error is in the previous rung so that's where the error message goes.
+		//	But just because there were no other errors for this rung doesn't mean there were none for the previous rung.
+		//	And most errors are more important than bungs.  Only perform this test is no errors were found on the previous
+		//	rung.
+
+		if (!rung.previousSibling.classList.contains ("error"))
+		{
+			if (findBungs (ladder, index))
+			{	//	Unlike other error messages, this message should go on the previous rung.
+
+				errorMessage (rung.previousSibling, "A bung has been detected.  This word is unnecessary.");
+				return;
+			}
+		}
 	}
 }
 
-//	01	This function is depricated
-// function reNumberRungs ()
-// {	//	A rung has been inserted somewhere in the ladder.  If it was inserted somewhere before the end, the rung
-// 	//	number and indices are now wrong and need to be reassigned based on the position of the rungs in the ladder.
-// 	//
-// 	//	Most of the time, the new rung is at the end of the ladder, and I could just assign the number and indices
-// 	//	based on the length of the ladder.  But it isn't always added to the end, and then I need a different method
-// 	//	to assign those indices  Having two methodologies complicates things a bit.  I have to know which 'Add' button
-// 	//	was clicked (I do) and perform the appropriate procedure.  Renumbering is a relatively trivial operation, and
-// 	//	even a long word ladder won't have 100 entries.  Having one methodology, instead of two, simplifies program
-// 	//	flow and makes maintenance more efficient.
-// 	//
-// 	//	So I'm always going to renumber...
+function countChanges (ladder, index)
+{	//	Each word in a word ladder must differ from the previous word by one, and only one, letter.  Compare the word
+	//	at ladder[index] to the word at ladder[index-1].  Count the letters that are different.
 
-// 	const ladder = Array.from (getLadder().children);
+	let count = 0;
 
-// 	ladder.forEach ((rung, index) =>
-// 	{
-// 		rung.setAttribute ("id", "rung-" + index);
-// 		rung.setAttribute ("index", index);
+	for (let i=0; i<ladder[index].length; i++)
+	{
+		if (ladder[index].charAt(i) != ladder[index-1].charAt(i)) count++;
+	}
 
-// 		const number = rung.querySelector ("#number");
-// 		number.setAttribute ("index", index);
-// 		number.value = index;
+	return count;
+}
 
-// 		const input = rung.querySelector ("#word");
-// 		input.setAttribute ("index", index);
-
-// 		const button = rung.querySelector ("#add");
-// 		button.setAttribute ("index", index);
-
-// 		const span = rung.querySelector ("#span")
-// 		span.setAttribute ("index", index);
-// 	})
-// }
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	Event handlers for blur and focus events
-
-//	01	This function is depricated
-// let saveIndex = undefined;
-// let saveValue = undefined;
-
-// function blurEventHandler (event)
-// {	event.preventDefault();
-// 	const target = event.target;
-
-// 	//	If I'm going to use the ESC key to undo changes made to a word in the ladder, I have to know which word was
-// 	//	being edited...and the <input> is not exposed by a keydown or keyup event.  So I'm listening for blur and focus
-// 	//	events, which do identify the <input> element.
-
-// 	//	On a side note...w3schools lies.  These event listeners were originally coded on the parent element of the rungs.
-// 	//	I was using blur and focus events, but they never triggered.  I 'learned' on w3schools that blur and focus events
-// 	//	don't bubble up, but focusout and focusin do (and they're supposedly the same thing, otherwise).  Good.  I can
-// 	//	handle focusout and focusin events on any number of <input> elements with just one event listener on their parent
-// 	//	element.  When I tested I discovered these events are only triggered when the parent lost focus...in other words
-// 	//	when you left the page.  So I moved the .addEventListener() and added one to each of the <input> elements.  No
-// 	//	change.  The event still only triggers when the PAGE loses focus.  So I switched back to using blur and focus events
-// 	//	but I have them on each <input>.  Now it works the way I want it to, except I have multiple event listeners instead
-// 	//	of just one.
-// 	//
-// 	//	So much for documentation.
-
-// 	//	The cursor has left the <input> without the ESC key being pressed.  The cursor is not currently in any
-// 	//	<input> field (although it will be shortly).  Set currentIndex and currentValue equal to 'undefined'.
-
-// 	saveIndex = undefined;
-// 	saveValue = undefined;
-
-// 	if (target.value == "")
-// 	{	//	Any <input> element (other than the last one in the ladder) should be removed from the DOM if there is no text
-// 		//	in the <input> element when it looses focus.  Remove the entire rung, the parent container, the sequence
-// 		//	number, the word, the add button, etc.  That <div> is the parent of the <input> that triggered this event.
-		
-// 		if (target.parentElement != getLadder().lastChild)
-// 			getLadder().removeChild (target.parentElement);
-// 	}
-// 	else
-// 	{
-// 		checkForDuplicates (target);
-// 		clearBungMessage();
-// 		checkForBungs();
-// 	}
-// }
-
-function checkForDuplicates (word)
+function findDuplicates (ladder, index)
 {	//	Check the ladder for duplicate entries.  But comparing every entry to every entry is not very efficient, I only
 	//	need to compare each combination of word once.  So, compare the value each word <input> to only those words that
 	//	precede it in the ladder.
 
-	const ladder = document.getElementById ("ladder");
-	const rungs = Array.from (ladder.children);
-	rungs.forEach ((r1, i1) =>
+	let duplicate = false;
+	ladder.forEach ((l, i) =>
 	{
-		rungs.forEach ((r2, i2) =>
+		if (i != index)
 		{
-			if (i1 > i2)
-			{
-				const input1 = r1.querySelector ("#word");
-				const input2 = r2.querySelector ("#word");
-
-				if (input1.value == input2.value)
-					putMessage (input1, "This word is already in the ladder");
-				else
-				{
-					const span = input1.parentElement.querySelector ("#span");
-					if (span.innerText == "This word is already in the ladder") span.innerText = "";
-				}
-			}
-		})
-	})
-}
-
-function clearBungMessage()
-{	//	Iterate through the ladder and remove the text "The ladder has a bung" from each rung's message <span>.  Leave
-	//	any other messages intact.
-
-	const ladder = document.getElementById ("ladder");
-	const rungs = Array.from (ladder.children);
-
-	rungs.forEach (r =>
-	{
-		const span = r.querySelector ("#span");
-		if (span.innerText == "The ladder has a bung") span.innerText = "";
-	})
-
-}
-
-function checkForBungs ()
-{	//	Check for 'bungs'  A bung is a condition where the changed letter in two consequitive word pairs is in the
-	//	same position of their respective words.  For instance: feed → feel → feet.  'feed' and 'feel' differ only in
-	//	the fourth letter.  Likewise, 'feel' and 'feet' differ only in the fourth letter.  The middle word ('feel')
-	//	could be omitted without affecting the ladder.
-	//
-	//	Bungs are allowed, but are considered bad form.
-
-	//	It would be most efficient to only check for bungs that include the word being edited, but even a long ladder only
-	//	has 30 to 40 entries, certainly fewer than 100.  So even checking every combination in the ladder will be quick
-	//	enough that a user probably wouldn't notice.
-
-	const rungs = Array.from (document.getElementById ("ladder").children);
-
-	for (let i=0; i<rungs.length; i++)
-	{	//	For each rung in the ladder, compare the word contained in that rung with the words in the rungs
-		//	immediately before and after.
-
-		try
-		{
-			const first = rungs[i-1].querySelector ("#word");
-			const second = rungs[i].querySelector ("#word");
-			const third = rungs[i+1].querySelector ("#word");
-
-			if (bungFound (first, second, third))
-			{	putMessage (first, "The ladder has a bung");
-				putMessage (second, "The ladder has a bung");
-				putMessage (third, "The ladder has a bung");
-
-				return false;
-			}
+			if (ladder[index] == ladder[i]) duplicate = true;
 		}
-		catch (error)
-		{	//	Attempting to access an element that isn't in the DOM will throw an error.  There is no elememt before
-			//	the first or after the last.  This is expected and the code is wrapped in a try-block the keep the
-			//	script from crashing.  There is nothing to do here and the catch() really isn't needed.  It's only
-			//	here because JavaScript requires it.
-		}
-	}
-
-	return true;
+	})
+	return duplicate;
 }
 
-function bungFound (one, two, three)
-{	//	Check for bungs.  A bung is consequetive word pairs that change letters in the same position. For instance:
-	//	feed → feel → feet.  Bungs are considered bad form as the middle word (in this case 'feel') is unnecessary.  It
-	//	can be removed without affecting the ladder.
+function findBungs (ladder, index)
+{	//	A bung is consequetive word pairs that change letters in the same position. For instance: feed → feel → feet.
+	//	Bungs are considered bad form as the middle word (in this case 'feel') is unnecessary.  It can be removed without
+	//	affecting the ladder.
 
-	//	Since this script iterates through the entire ladder, some combinations of rungs don't exist.  There isn't
-	//	a rung immediately preceeding the first rung in the ladder, for instance.  I only need to check those combinations
-	//	that do exist.
-
-	if (!one) return;
-	if (!three) return;
-
-	let changeAt1 = undefined;
-	let changeAt2 = undefined;
-
-	for (let i=0; i<one.value.length; i++)
+	for (let i=0; i<ladder[index].length; i++)
 	{
-		if (one.value.charAt(i) != two.value.charAt(i)) changeAt1 = i;
-		if (two.value.charAt(i) != three.value.charAt(i)) changeAt2 = i;
+		if ((ladder[index].charAt(i) != ladder[index-1].charAt(i)) && (ladder[index-1].charAt(i) != ladder[index-2].charAt(i)))
+			return true;
 	}
 
-	return (changeAt1 == changeAt2);
+	return false;
 }
 
-function importEventHandler (event)
-{	event.preventDefault();
-	target = event.target;
-
-	//	This function handles a click event on the inport button.
-	//	Convert the data in the textarea to an array
-	//	Iterate that array...
-	//		Create a DOM element to display the current element of the array
-	//		Invoke existing functions to validate this entry
-}
-
-// function tooShort (current)
-// {	//	All of the words in a word ladder must be the same number of characters.  Compare the length of value in the
-// 	//	<input> element currently being edited with some standard.  There are two possibilities for that standard:
-// 	//	the first word in the ladder and the immediately preceding word in the ladder.  I choose to use the first, as
-// 	//	that seems to obviate some error conditions...it always exists.
-
-// 	const rung = getLadder().firstChild;
-// 	const first = rung.querySelector ("#word");
-
-// 	return (current.value.length < first.value.length);
-// }
-
-// function tooLong (current)
-// {	//	All of the words in a word ladder must be the same number of characters.  Compare the length of value in the
-// 	//	<input> element currently being edited with some standard.  There are two possibilities for that standard:
-// 	//	the first word in the ladder and the immediately preceding word in the ladder.  I choose to use the first, as
-// 	//	that seems to obviate some error conditions...it always exists.
-
-// 	const rung = getLadder().firstChild;
-// 	const first = rung.querySelector ("#word");
-
-// 	return (current.value.length > first.value.length);
-// }
-
-function duplicatesPrevious (current)
-{	//	Compare the value in the current <input> element with the immediately preceding rung.  Return any appropriate
-	//	messages.
-	//
-	//	The <input> to be compared are child elements of a parent container.  The parent containers are siblings.  I
-	//	suppose that means the <input> elements are cousins.
-
-	const cousin = getCousin (current);
-
-	//	And compare...	Check for missing rungs (a word pair with more than one letter different)
-
-	let count = 0;
-
-	for (let i=0; i<current.value.length; i++)
-	{
-		if (current.value.charAt(i) != cousin.value.charAt(i)) ++count;
-	}
-
-	return (count == 0);
-}
-
-function missingRungs (current)
-{	//	Compare the value in the current <input> element with the immediately preceding rung.  Return any appropriate
-	//	messages.
-	//
-	//	The <input> to be compared are child elements of a parent container.  The parent containers are siblings.  I
-	//	suppose that means the <input> elements are cousins.
-
-	const cousin = getCousin (current);
-
-	//	And compare...	Check for missing rungs (a word pair with more than one letter different)
-
-	let count = 0;
-
-	for (let i=0; i<current.value.length; i++)
-	{
-		if (current.value.charAt(i) != cousin.value.charAt(i)) ++count;
-	}
-
-	return (count != 1);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	Various utility functions used throughout the script
+//
 
-// function disableAddButton (element)
-// {	//	Disable the add button that is a sibling of the indicated <input> element.
+//	Alter an element's classList to make the element visible.  Elements are hidden by including a class 'hidden' in their
+//	classList.  Remove that class and the element should display.
 
-// 	element.parentElement.querySelector ("#add").setAttribute ("disabled", true);
-// }
+function displayElement (e) { e.classList.remove ("hidden"); }
 
-// function enableAddButton (element)
-// {	//	Disable the add button that is a sibling of the indicated <input> element.
+function errorMessage (rung, message)
+{	//	Put the indicated message into the message <span> element for the currently selected <input>
 
-// 	element.parentElement.querySelector ("#add").removeAttribute ("disabled");
-// }
+	rung.querySelector ("#message").value = message;
+	rung.classList.add ("error");
+}
 
 function findDelimiter ()
 {	//	Returns the string (probably a single character) used to format the imported dataset.  This delimiter
@@ -665,31 +446,12 @@ function findSelection ()
 	return id;
 }
 
-// function getCousin (element, next = false)
-function getPreviousCousin (element)
-{	//	This function returns the <input> element of immediately adjacent rungs.  The parameter next is used to select
-	//	rung the immediately before or after the element in question.
-	//
-	//	<input> elements are children of rungs, and rungs are siblings.  That means the <input> elements are cousins.
+//	getLadder() returns a reference to the parent element of the rungs, a <section> with id = 'ladder-section'
 
-	const parent = element.parentElement;
-	const uncle = next ? parent.nextSibling : parent.previousSibling;
-	return uncle.querySelector ("#word");
-}
+function getLadder () { return document.getElementById ("ladder-section"); }
 
-// function getNextCousin (element)
-// {	getCousin (element, true);
-// }
+//	Alter an element's classList to hide the element.  Elements are hidden by including a class 'hidden' in their
+//	classList.
 
-function getLadder ()
-{	//	Return a reference to the <div> element that contains the rungs...
+function hideElement (e) { e.classList.add ("hidden"); }
 
-	return document.getElementById ("ladder-section");
-}
-
-function putMessage (input, message)
-{	//	Put the indicated message into the message <span> element for the currently selected <input>
-
-	const rung = input.parentElement;
-	rung.querySelector ("#span").innerText = message;
-}
