@@ -90,7 +90,7 @@ textarea.background
 .rung > .number
 {
 	text-align: right;
-	width: 20px;
+	width: 30px;
 }
 
 .rung > .word
@@ -100,8 +100,6 @@ textarea.background
 
 .rung > .message
 {
-	/* border-color: red; */
-	/* color: red; */
 	flex-grow: 1;
 	flex-shrink: 0;
 	width: 200px;
