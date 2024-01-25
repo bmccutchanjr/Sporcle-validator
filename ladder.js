@@ -47,15 +47,17 @@ function helpClickHandler ()
 function displayElement (e)
 {	//	Alter the element's classList to make the element visible.  Remove class 'hide' and add class 'display'.
 
-	e.classList.remove ("hide");
-	e.classList.add ("display");
+//		e.classList.remove ("hide");
+//		e.classList.add ("display");
+e.classList.remove ("hidden");
 }
 
 function hideElement (e)
 {	//	Alter the element's classList to hide the element.  Remove class 'display' and add class 'hide'.
 
-	e.classList.remove ("display");
-	e.classList.add ("hide");
+//		e.classList.remove ("display");
+//		e.classList.add ("hide");
+e.classList.add ("hidden");
 }
 
 function closePopUp ()
@@ -231,75 +233,122 @@ function importClickHandler (event)
 
 	//	The import button was clicked, several things need to happen.
 
-	//	Hide the import section
+	//	Hide the import-section and display ladder-section
 	hideElement (document.getElementById ("import-section"));
-
-	//	Display the ladder section
 	displayElement (document.getElementById ("ladder-section"));
 
-	//	Convert the content of <textarea> to an array and iterate that array.  For each element in the array:
-	const array = document.getElementById ("import-ladder").value.split (findDelimiter());
-alert (JSON.stringify (array, 2, " "));
-	//	1)	Create an element in the DOM to display that rung
-	//	2)	Validate the element
-	//		A)	If this is the first element, do nothing
-	//		B)	If this is any other element
-	//			i)		compare the length of the element to the length of the first element.
-	//			ii)		compare the current element to the immediately previous
-	//					a)	0 letters are different is an error (duplicate entry)
-	//					b)	1 letter must be different -- and one letter only
-	//					c)	more than one letter different is an error (missing rung)
-	//			iii)	check for duplicate words: compare this element to ALL preceding elements
-	//		C)	If this is the third element, or higher, check for bungs
-	//			I need previousCousin to place the error message...
-	//		
+	//	This is the core functionality of the application.
+	//
+	//	Convert the input to an array, create DOM elements to display each rung, validate the entries and display
+	//	appropriate messages.
+	const ladder = document.getElementById ("import-ladder").value.split (findDelimiter());
+	ladder.forEach ((l, i) =>
+	{
+		//	Trim the elements of the array to remove extraneous whitespce.  It seems that the variable 'l' is not
+		//	a reference to the corresponding element of the array -- trimming one does not trim the other.  So explicitly
+		//	trim the elements of the array as well as the working variable 'l'.  I would not have this problem (and some
+		//	others) if this were a for-loop -- maybe it should be.
+
+		ladder[i] = ladder[i].trim();
+		l = l.trim();
+
+		const rung = createRung (l, i);
+
+		//	There is nothing to compare the first rung of the ladder to.
+
+		if (i > 0) validateRung (ladder, rung, i);
+	})
 }
 
-function addRung (referenceRung)
+function createRung (rung, index)
 {	//	Add a rung to the ladder.  The steps of an actual ladder are called rungs and the terminology has stuck for
-	//	word ladders.  Each word is refered to as a 'rung'.
+	//	word ladders.  Each word in a word ladder is called a 'rung'.
 	//
-	//	This function creates a <div> that contains an <input> and a <span> element to display messages.
+	//	This function creates a <div> that contains two read only <input>.  One to display the rung and one to display
+	//	optional messages that may be generated later.
 
-//		clearBungMessage();
-//		checkForBungs();
+	getLadder().append (div);
 
 	const div = document.createElement ("div");
-	div.classList.add ("rung");
-	if (referenceRung == undefined)
-		getLadder().append (div);
-	else
-		getLadder().insertBefore (div, referenceRung.nextSibling);
 
 	const number = document.createElement ("input");
 	number.classList.add ("number");
 	number.setAttribute ("id", "number");
 	number.setAttribute ("readonly", true);
+	number.value = index;
 	div.append (number);
 
-	const input = document.createElement ("input");
-	input.classList.add ("word");
-	input.setAttribute ("id", "word");
-	input.setAttribute ("placeholder", "word");
-	input.setAttribute ("title", "Enter the next word in the puzzle");
-	div.append (input);
+	const word = document.createElement ("input");
+	word.classList.add ("word");
+	word.setAttribute ("id", "word");
+	word.setAttribute ("readonly", true);
+	word.value = rung;
+	div.append (word);
 
-	input.addEventListener ("blur", event => { blurEventHandler(event) } );
-	input.addEventListener ("focus", event => { focusEventHandler(event) } );
-	input.select();
+	const message = document.createElement ("input")
+	message.setAttribute ("id", "message");
+	div.append (message);
+}
 
-	const button = document.createElement ("button");
-	button.innerText = "Add";
-	button.setAttribute ("id", "add");
-	button.setAttribute ("title", "Add this word to the ladder");
-	div.append (button);
+function validateRung (ladder, rung, index)
+{	//	Validating the rungs (and ladder as a whole) is handled as a function call from the event handler, rather
+	//	than in-line in the handler.
+	//
+	//	This allows the function to return after any error is found, simplifying the code and making it easier to
+	//	understand.  Some errors may go undetected, but it isn't necessary to find every one, one error anywhere in the
+	//	ladder invalidates the whole ladder.
 
-	const span = document.createElement ("span")
-	span.innerText = "";
-	span.setAttribute ("id", "span");
-	div.append (span);
+// //	There is nothing to compare the first rung of the ladder to.
 
-//	01	reNumberRungs ();
+// if (index == 0) return;
+
+	//	All rungs in the ladder must be the same length.  I need a standard, and I choose the first rung of the ladder.
+	//	It's a completely arbitrary decision.
+
+	if (a.length < ladder[0].length)
+	{	errorMessage (rung, "This rung is too short");
+		return;
+	}
+
+	if (a.length > ladder[0].length)
+	{	errorMessage (rung, "This rung is too long");
+		return;
+	}
+
+	//	Each rung in the ladder must differ from the previous rung by one, and only one, letter; e.g.; 'fish' amd 'wish'.
+	//	Compare this rung to the rung immediately above it.
+
+	const count = countChangedLetters (i);
+
+	if (count == 0)
+	{
+		errorMessage (rung, "This rung duplicates the previous rung.  It's unnecessary");
+		return;
+	}
+
+	if (count > 1)
+	{
+		errorMessage (rung, "There are missing rungs");
+		return;
+	}
+
+	//	The same word should not be used more than once.
+
+	if (findDuplicates (i))
+	{
+		errorMessage (rung, "This word has been used previously");
+		return;
+	}
+
+	//	Each rung in the ladder must differ from the previous rung by one, and only one, letter.  But the position of
+	//	the changed letter should not be the same in two or more rungs.  For instance, 'then', 'than' and 'that' is okay, 
+	//	'then', 'than' and 'thin' is not.  The change is in the third letter each time.  This is called a 'bung' and it's
+	//	frowned upon.  Although it doesn't invalidate the ladder, the middle word can be eliminated without affecting it.
+
+	if (findBungs (i))
+	{	//	Unlike other error messages, this message should go on the previous rung.
+
+	}
 }
 
 //	01	This function is depricated
@@ -510,29 +559,29 @@ function importEventHandler (event)
 	//		Invoke existing functions to validate this entry
 }
 
-function tooShort (current)
-{	//	All of the words in a word ladder must be the same number of characters.  Compare the length of value in the
-	//	<input> element currently being edited with some standard.  There are two possibilities for that standard:
-	//	the first word in the ladder and the immediately preceding word in the ladder.  I choose to use the first, as
-	//	that seems to obviate some error conditions...it always exists.
+// function tooShort (current)
+// {	//	All of the words in a word ladder must be the same number of characters.  Compare the length of value in the
+// 	//	<input> element currently being edited with some standard.  There are two possibilities for that standard:
+// 	//	the first word in the ladder and the immediately preceding word in the ladder.  I choose to use the first, as
+// 	//	that seems to obviate some error conditions...it always exists.
 
-	const rung = getLadder().firstChild;
-	const first = rung.querySelector ("#word");
+// 	const rung = getLadder().firstChild;
+// 	const first = rung.querySelector ("#word");
 
-	return (current.value.length < first.value.length);
-}
+// 	return (current.value.length < first.value.length);
+// }
 
-function tooLong (current)
-{	//	All of the words in a word ladder must be the same number of characters.  Compare the length of value in the
-	//	<input> element currently being edited with some standard.  There are two possibilities for that standard:
-	//	the first word in the ladder and the immediately preceding word in the ladder.  I choose to use the first, as
-	//	that seems to obviate some error conditions...it always exists.
+// function tooLong (current)
+// {	//	All of the words in a word ladder must be the same number of characters.  Compare the length of value in the
+// 	//	<input> element currently being edited with some standard.  There are two possibilities for that standard:
+// 	//	the first word in the ladder and the immediately preceding word in the ladder.  I choose to use the first, as
+// 	//	that seems to obviate some error conditions...it always exists.
 
-	const rung = getLadder().firstChild;
-	const first = rung.querySelector ("#word");
+// 	const rung = getLadder().firstChild;
+// 	const first = rung.querySelector ("#word");
 
-	return (current.value.length > first.value.length);
-}
+// 	return (current.value.length > first.value.length);
+// }
 
 function duplicatesPrevious (current)
 {	//	Compare the value in the current <input> element with the immediately preceding rung.  Return any appropriate
@@ -635,7 +684,7 @@ function getPreviousCousin (element)
 function getLadder ()
 {	//	Return a reference to the <div> element that contains the rungs...
 
-	return document.getElementById ("ladder");
+	return document.getElementById ("ladder-section");
 }
 
 function putMessage (input, message)
