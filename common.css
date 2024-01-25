@@ -30,40 +30,83 @@ header
 
 main
 {
-	display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-		justify-content: space-between;
 	margin: 0px auto;
 	width: var(--page-width);
 }
 
-main > section
+textarea
 {
-	text-align: left;
-	width: 45%;
+	background-repeat: no-repeat;
+	height: auto;
+		min-height: 50vh;
+	margin-bottom: 15px;
+	margin-top: 5px;
+	resize: none;
+	width: 100%;
 }
 
-main > section:last-child
+textarea.background
+{
+	background-image: url("import background.png");
+		background-position: center;
+		background-repeat: no-repeat;
+}
+
+#import-button
+{
+	margin-top: 10px;
+}
+
+#ladder
+{	/*	There should be a 25px margin at the bottom of the word ladder													*/
+	margin-bottom: 25px;
+}
+
+.rung
+{	/*	There should be a 5px margin between each rung of the ladder													*/
+	margin-top: 5px;
+}
+
+#ladder:last-child
+{	/*	But the first rung of the ladder needs no margin																*/	
+	margin-top: 0px;
+}
+
+.rung > *
+{	/*	There should be a 10px margin between the children of each rung													*/
+	margin-right: 10px;
+}
+
+.rung:last-child
+{	/*	But the last child needs no margin																				*/
+	margin-right: 0px;
+}
+
+.rung > .number
 {
 	text-align: right;
+	width: 20px;
 }
 
-main > section > div
+.rung > .word
 {
-	margin-bottom: 8px;
+	width: 100px;
 }
 
-#word-input.error-message
+.rung > span
 {
-	border-color: red;
-	color: red
-}
-
-.error-message
-{
+	/* border-color: red; */
 	color: red;
-	height: 14px;
+}
+
+.display
+{
+	display: block;
+}
+
+.hidden
+{
+	display: none;
 }
 
 /*                                         */

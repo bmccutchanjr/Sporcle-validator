@@ -10,25 +10,27 @@
 </head>
 
 <body>
-	<div id="wrapper">
-		<header></header>
-		<main>
-			<section>
-				<div>
-					<input id="word-input" name="word-input" placeholder="Enter a word" onfocus="this.select(all);">
-					<button id="add-word">Add</button>
+	<main id="wrapper">
+		<section id="import-section">
+			<button id="about-button">About</button>
+			<button id="help-button">Help</button>
+			<button id="reload-button">Reload</button>
+			<div id="import-wrapper">
+				<textarea id="import-ladder" class="background"></textarea>
+				<div id="delimiter-wrapper" class="hidden">
+					<span>Select data delimiter:</span><br>
+					<input type="radio" name="delimiter-selector" id="comma-delimited" value="commas"><label for="comma-delimited">Comma</label><br>
+					<input type="radio" name="delimiter-selector" id="tab-delimited" value="tab"><label for="tab-delimited">Tab</label><br>
+					<input type="radio" name="delimiter-selector" id="line-delimited" value="new line"><label for="line-delimited">New Line</label><br>
+					<input type="radio" name="delimiter-selector" id="other-delimited" value="other"><label for="other-delimited">Other</label><br>
+					<input type="text" name="other-delimiter" id="other-delimiter" class="hidden">
+				<button id="import-button" disabled>Import data</button>
 				</div>
-				<div class="error-message"></div>
-				<div>
-					<p>This is a simple application designed to validate "word ladder" puzzles.</p>
-					<p>A word ladder is a type of word puzzle made up of a series of words, called 'rungs'.  Each word varies from the immediately preceeding word by one, and ony one, letter.  For example feed → feel.  The words in the ladder can be almost any length (minimum length of 3 letters) but they must all be the same length.  There may be any number of words in the ladder.</p>
-					<p>This page checks for word length, duplicate words, missing rungs (more than one letter changed in a single word pair) and 'bungs'.  Bungs are word triplets where the same letter is changed; for example feed → feel → feet.  Bungs are allowed, but unnecessary, and are considered bad form.</p>
-				</div>
-			</section>
-			<section id="ladder-section"></section>
-		</main>
+			</div>
+		</section>
+		<section id="ladder-section" class="hidden"></section>
 		<div id="push"></div>
-	</div>
+	</main>
 
 	<footer>
 		<div id="footer">
@@ -36,6 +38,26 @@
 			<div>&copy;2023&nbsp;&nbsp;All rights reserved</div>
 		</div>
 	</footer>
+
+	<section id="about-wrapper" class="hidden">
+		<div id="about-div" class="hidden">
+			<p>This is a simple application designed to validate 'word ladder' puzzles.</p>
+			<p>A word ladder is a type of word puzzle made up of a series of words, called 'rungs'.  You climb up or down the ladder by entering a word, but there is only one correct word for each rung.  Your job is to figure out what that word is.</p>
+			<p>For example feed → feel.  The words in the ladder can be almost any length (minimum length of 3 letters) but they must all be the same length.  There may be any number of words in the ladder.</p>
+			<p>Each word varies from the immediately preceeding word by one, and ony one, letter.  For example feed → feel.  The words in the ladder can be almost any length (minimum length of 3 letters) but they must all be the same length.  There may be any number of words in the ladder.</p>
+			<p>Each rung has a hint that will help you figure out the correct word for that rung.</p>
+			<p>This page checks for word length, duplicate words, missing rungs (more than one letter changed in a single word pair) and 'bungs'.  Bungs are word triplets where the same letter is changed; for example feed → feel → feet.  Bungs are allowed, but unnecessary, and are considered bad form.</p>
+			<button id="use-button" title="How to use this application">How to use</button>
+			<button id="close-button" title="Close this window and continue editing">Close</button>
+		</div>
+		<div id="use-div" class="hidden">
+			<p>Enter a word in any of the input fields.  As you type, the application will check for word length, missing rungs and bungs.  Any warnings will appear to the right of the input field.</p>
+			<p>Press ESC while editing to undo any edits.  ESC only works on the input field currently being edited.</p>
+			<p>To add a new word to the ladder, enter that word in the last input field and click the 'add' button beside it.  A fresh input for the next rung will be added at the end of the list.</p>
+			<p>To add a word above any existing rungs, click the 'add' button beside that rung.  A fresh input will be inserted into the ladder.</p>
+			<button id="close-button" title="Close this window and continue editing">Close</button>
+		</div>
+	</section>
 </body>
 
 <script src="ladder.js" language="JavaScript"></script>
