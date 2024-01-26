@@ -34,7 +34,7 @@ window.addEventListener ("load", event =>
 function aboutClickHandler ()
 {	//	Create a pop-up window with description of the application
 	//	Make sure "how to use" is hidden...
-	hideElement (document.getElementById ("use-div"));
+	hideElement (document.getElementById ("help-div"));
 
 	//	And display "about"
 	displayElement (document.getElementById ("about-div"));

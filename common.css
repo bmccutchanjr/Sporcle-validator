@@ -34,6 +34,27 @@ main
 	width: var(--page-width);
 }
 
+.display
+{
+	display: block;
+}
+
+.hidden
+{
+	display: none;
+}
+
+
+/*	******************************************************************************************************************	*/
+/*	******************************************************************************************************************	*/
+/*	Style specific to the import section and its children																*/
+/*																														*/
+
+#import-section
+{
+	padding: 5px;
+}
+
 textarea
 {
 	background-repeat: no-repeat;
@@ -57,10 +78,19 @@ textarea.background
 	margin-top: 10px;
 }
 
-#ladder-section
+
+
+/*	******************************************************************************************************************	*/
+/*	******************************************************************************************************************	*/
+/*	Style specific to the ladder section and its children																*/
+/*																														*/
+
+/*	Since when goes padding at the top of the page mess with the sticky footer?	*/
+/* #ladder-section
 {
 	padding: 5px;
-}
+} */
+/*	Since when goes padding at the top of the page mess with the sticky footer?	*/
 
 .rung
 {	/*	There should be a 5px margin between each rung of the ladder													*/
@@ -107,17 +137,35 @@ textarea.background
 .rung.error > *
 {
 	background: red;
+	border-color: red;
 	color: white;
 }
 
-.display
+
+
+/*	******************************************************************************************************************	*/
+/*	******************************************************************************************************************	*/
+/*	Style specific to the about section and its children																*/
+/*																														*/
+
+#about-wrapper
 {
-	display: block;
+	background-color: rgba(255, 255, 255, 0.75);
+	position: absolute;
+		left: 0px;
+		top: 0px;
+	height: auto;
+		min-height: 100vh;
+	width: 100%;
 }
 
-.hidden
+#about-div,
+#help-div
 {
-	display: none;
+	border: 2px black solid;
+	margin: 25px auto;
+	padding: 20px;
+	width: var(--page-width);
 }
 
 /*                                         */
