@@ -3,6 +3,7 @@ window.addEventListener ("load", event =>
 
 	//	Event listeners for miscellaneous buttons
 	document.getElementById("about-button").addEventListener ("click", event => { aboutClickHandler(event) } );
+	document.getElementById("close-button").addEventListener ("click", event => { closeClickHandler(event) } );
 	document.getElementById("help-button").addEventListener ("click", event => { helpClickHandler(event) } );
 	document.getElementById("reload-button").addEventListener ("click", event => { location.reload() } );
 
@@ -41,18 +42,7 @@ function aboutClickHandler ()
 	displayElement (document.getElementById ("about-wrapper"));
 }
 
-function helpClickHandler ()
-{	//	Create a pop-up window with description of the application
-
-	//	Make sure "how to use" is hidden...
-	hideElement (document.getElementById ("use-div"));
-
-	//	And display "about"
-	displayElement (document.getElementById ("about-div"));
-	displayElement (document.getElementById ("about-wrapper"));
-}
-
-function closePopUp ()
+function closeClickHandler ()
 {	//	Close (hide) the pop-up window
 	//
 	//	Closing the pop-up window is simply making sure that none of the elements of the window are displayed.  Add
@@ -60,7 +50,18 @@ function closePopUp ()
 
 	hideElement (document.getElementById ("about-div"));
 	hideElement (document.getElementById ("about-wrapper"));
-	hideElement (document.getElementById ("use-div"));
+	hideElement (document.getElementById ("help-div"));
+}
+
+function helpClickHandler ()
+{	//	Create a pop-up window with description of the application
+
+	//	Make sure "how to use" is hidden...
+	hideElement (document.getElementById ("help-div"));
+
+	//	And display "about"
+	displayElement (document.getElementById ("about-div"));
+	displayElement (document.getElementById ("about-wrapper"));
 }
 
 
