@@ -43,23 +43,22 @@
 		<div id="about-div" class="hidden">
 			<p>This is a simple application designed to validate 'word ladder' puzzles.</p>
 			<p>A word ladder is a type of word puzzle made up of a series of words.  Each word is called a 'rung'.  You climb up or down the ladder by entering a word, but there is only one correct word for each rung.  Your job is to figure out what that word is.</p>
-			<p>For example feed → feel.  The words in the ladder can be almost any length (minimum length of 3 letters) but they must all be the same length.  There may be any number of words in the ladder.</p>
 			<p>Each word varies from the immediately preceeding word by one, and ony one, letter.  For example feed → feel.  The words in the ladder can be almost any length (minimum length of 3 letters) but they must all be the same length.  There may be any number of words in the ladder.</p>
 			<p>Each rung has a hint that will help you figure out the correct word for that rung.</p>
 			<p>This page checks for word length, duplicate words, missing rungs (more than one letter changed in a single word pair) and 'bungs'.  Bungs are word triplets where the same letter is changed; for example feed → feel → feet.  Bungs are allowed, but unnecessary, and are considered bad form.</p>
 			<button id="more-button" title="How to use this application">More</button>
-			<button id="close-button" title="Close this window and continue editing">Close</button>
+			<button id="close-about" class="close-button" title="Close this window and continue editing">Close</button>
 		</div>
 		<div id="help-div" class="hidden">
 			<p>1)	The application consists of a text input area and a group of radio buttons.  You can enter your ladder directly into the input, or paste them from some other application (perhaps a spreadsheet).
 			<p>2)	The dataset must represent a one-dimensional array (a list) of words.  Each word is separated by a special character called a delimiter.  Commonly used delimiters include commas (,), tabs and new-line.  Tabs and new-line are often used together to represent two-dimensional arrays of data, like a table.  It's a common format used by many spreadsheets.</p>
-			<p>3)	After you've entered your data, the application will try to determine what delimiter is used in your dataset.  A series of radio buttons appears with the applications best guess highlighted.</p>
+			<p>3)	After you've entered your data, the application will try to determine what delimiter is used in your dataset.  A series of radio buttons appears with the application's best guess highlighted.</p>
 			<p>4)	You can specify the delimiteer if that best guess is incorrect.  Select 'other' and type the delimiter into the input field.  The delimiter can be anything you can type, including single letters and numbers, or multiple character strings.</p>
 			<p>5)	Click the Import button.</p>
 			<p>The application will separate your dataset into a series of discrete words.  The delimiters and any leading or trailing whitespace is removed.</p>
 			<p>The application checks your data for likely errors.  Entries that aren't equal length, missing rungs, duplicate entries and bungs.</p>
 			<p>You can reset the application by reloading the page.</p>
-			<button id="close-button" title="Close this window and continue editing">Close</button>
+			<button id="close-help" class="close-button" title="Close this window and continue editing">Close</button>
 		</div>
 	</section>
 </body>

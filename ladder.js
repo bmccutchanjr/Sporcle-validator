@@ -3,8 +3,10 @@ window.addEventListener ("load", event =>
 
 	//	Event listeners for miscellaneous buttons
 	document.getElementById("about-button").addEventListener ("click", event => { aboutClickHandler(event) } );
-	document.getElementById("close-button").addEventListener ("click", event => { closeClickHandler(event) } );
+	document.getElementById("close-about").addEventListener ("click", event => { closeClickHandler(event) } );
+	document.getElementById("close-help").addEventListener ("click", event => { closeClickHandler(event) } );
 	document.getElementById("help-button").addEventListener ("click", event => { helpClickHandler(event) } );
+	document.getElementById("more-button").addEventListener ("click", event => { helpClickHandler(event) } );
 //		document.getElementById("reload-button").addEventListener ("click", event => { location.reload() } );
 
 	//	Events associated with the selection of delimiters
@@ -57,10 +59,10 @@ function helpClickHandler ()
 {	//	Create a pop-up window with description of the application
 
 	//	Make sure "how to use" is hidden...
-	hideElement (document.getElementById ("help-div"));
+	hideElement (document.getElementById ("about-div"));
 
 	//	And display "about"
-	displayElement (document.getElementById ("about-div"));
+	displayElement (document.getElementById ("help-div"));
 	displayElement (document.getElementById ("about-wrapper"));
 }
 
