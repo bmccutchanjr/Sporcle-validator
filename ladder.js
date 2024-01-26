@@ -5,7 +5,7 @@ window.addEventListener ("load", event =>
 	document.getElementById("about-button").addEventListener ("click", event => { aboutClickHandler(event) } );
 	document.getElementById("close-button").addEventListener ("click", event => { closeClickHandler(event) } );
 	document.getElementById("help-button").addEventListener ("click", event => { helpClickHandler(event) } );
-	document.getElementById("reload-button").addEventListener ("click", event => { location.reload() } );
+//		document.getElementById("reload-button").addEventListener ("click", event => { location.reload() } );
 
 	//	Events associated with the selection of delimiters
 	document.getElementById("delimiter-wrapper").addEventListener ("change", event => { delimiterChangeHandler(event) } );
