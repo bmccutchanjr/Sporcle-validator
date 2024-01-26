@@ -72,7 +72,6 @@ function closePopUp ()
 //	blur and focus events may be added to the <textarea> in the future, but the application should work just as well
 //	without them.
 
-
 function textareaPasteHandler (event)
 {	event.preventDefault();
 	target = event.target;
@@ -166,10 +165,10 @@ function selectRadioButton (which)
 	const opt = document.getElementsByName ("delimiter-selector");
 	opt.forEach (r => { r.checked = false; } );
 
-	//	And select one
+	//	...then select one
 	document.getElementById (which).checked = true;
 
-	//	and make it visible
+	//	and make the radio buttons visible
 	document.getElementById ("delimiter-wrapper").classList.remove ("hidden");
 }
 
@@ -183,11 +182,7 @@ function delimiterChangeHandler (event)
 	//	I'm not going to bother checking what type of DOM element triggered the event.  Something did, and the only elements
 	//	in the container that can are the <input> elements of the selector.  But which one?
 
-	// let selected = undefined;
-
-	// const opt = document.getElementsByName ("delimiter-selector");
-	// opt.forEach (r => { if (r.checked) selected = r.getAttribute ("id"); } );
-const selected = findSelection ();
+	const selected = findSelection ();
 
 	if (selected == "other-delimited")
 	{
@@ -286,14 +281,12 @@ function createRung (value, index)
 
 	const number = document.createElement ("input");
 	number.classList.add ("number");
-//		number.setAttribute ("id", "number");
 	number.setAttribute ("readonly", true);
 	number.value = index;
 	rung.append (number);
 
 	const word = document.createElement ("input");
 	word.classList.add ("word");
-//		word.setAttribute ("id", "word");
 	word.setAttribute ("readonly", true);
 	word.value = value;
 	rung.append (word);
