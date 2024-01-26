@@ -7,7 +7,6 @@ window.addEventListener ("load", event =>
 	document.getElementById("close-help").addEventListener ("click", event => { closeClickHandler(event) } );
 	document.getElementById("help-button").addEventListener ("click", event => { helpClickHandler(event) } );
 	document.getElementById("more-button").addEventListener ("click", event => { helpClickHandler(event) } );
-//		document.getElementById("reload-button").addEventListener ("click", event => { location.reload() } );
 
 	//	Events associated with the selection of delimiters
 	document.getElementById("delimiter-wrapper").addEventListener ("change", event => { delimiterChangeHandler(event) } );
@@ -89,7 +88,6 @@ function textareaPasteHandler (event)
 	textarea.change();
 }
 
-//	function textareaEventHandler (event)
 function textareaChangeHandler (event)
 {
 	// event.preventDefault();
