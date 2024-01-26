@@ -8,15 +8,17 @@ window.addEventListener ("load", event =>
 
 	//	Events associated with the selection of delimiters
 	document.getElementById("delimiter-wrapper").addEventListener ("change", event => { delimiterChangeHandler(event) } );
-	document.getElementById("import-ladder").addEventListener ("change", event => { textareaEventHandler(event) } );
+	document.getElementById("import-ladder").addEventListener ("change", event => { textareaChangeHandler(event) } );
 //	This doesn't do what I thought it did...I want an event that is triggered when something is pasted into an 
 //	element
 //		document.getElementById("import-ladder").addEventListener ("paste", event => { textareaEventHandler(event) } );
 //		document.getElementById("import-ladder").addEventListener ("paste", event => { document.getElementById("import-ladder").change (event) } );
 //	Both of the above prevent the data being pasted into the textarea, rather than detecting the event and alloing me to
 //	execute the change handler.
+//	document.getElementById("import-ladder").addEventListener ("paste", event => { textareaPasteHandler(event) } );
+//	That one is straight from MDN web site...and it still doesn't work
 //	document.getElementById("import-ladder").addEventListener ("blur", event =>
-	document.getElementById("import-ladder").addEventListener ("focus", event => { textareaFocusHandler (event) } );
+	document.getElementById("import-ladder").addEventListener ("focus", event => { textareaFocusHandler(event) } );
 
 	//	And the event listener for the import button
 	document.getElementById("import-button").addEventListener ("click", event => { importClickHandler(event) } );
@@ -70,7 +72,23 @@ function closePopUp ()
 //	blur and focus events may be added to the <textarea> in the future, but the application should work just as well
 //	without them.
 
-function textareaEventHandler (event)
+
+function textareaPasteHandler (event)
+{	event.preventDefault();
+	target = event.target;
+
+	const textarea = document.getElementById ("import-ladder");
+//		const data = event.clipboardData.getData ("text/plain");
+//		const data = event.clipboardData;
+//		const data = window.clipboardData.getData ("text/plain");
+	const data = (event.clipboardData || window.clipboardData).getData ("text");
+	textarea.value = data;
+
+	textarea.change();
+}
+
+//	function textareaEventHandler (event)
+function textareaChangeHandler (event)
 {
 	// event.preventDefault();
 	const target = event.target;
@@ -236,7 +254,7 @@ function importClickHandler (event)
 	//	appropriate messages.
 
 	const ladder = document.getElementById ("import-ladder").value.split (findDelimiter());
-	ladder.forEach ((l, i) =>
+	for (let i=0; i<ladder.length; i++)
 	{
 		//	Trim the elements of the array to remove extraneous whitespce.  It seems that the variable 'l' is not
 		//	a reference to the corresponding element of the array -- trimming one does not trim the other.  So explicitly
@@ -244,14 +262,15 @@ function importClickHandler (event)
 		//	others) if this were a for-loop -- maybe it should be.
 
 		ladder[i] = ladder[i].trim();
-		l = l.trim();
 
-		const rung = createRung (l, i);
+		const rung = createRung (ladder[i], i);
+
+		ladder[i] = ladder[i].toUpperCase();
 
 		//	There is nothing to compare the first rung of the ladder to.
 
 		if (i > 0) validateRung (ladder, rung, i);
-	})
+	}
 }
 
 function createRung (value, index)
@@ -267,14 +286,14 @@ function createRung (value, index)
 
 	const number = document.createElement ("input");
 	number.classList.add ("number");
-	number.setAttribute ("id", "number");
+//		number.setAttribute ("id", "number");
 	number.setAttribute ("readonly", true);
 	number.value = index;
 	rung.append (number);
 
 	const word = document.createElement ("input");
 	word.classList.add ("word");
-	word.setAttribute ("id", "word");
+//		word.setAttribute ("id", "word");
 	word.setAttribute ("readonly", true);
 	word.value = value;
 	rung.append (word);

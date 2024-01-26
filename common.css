@@ -57,34 +57,32 @@ textarea.background
 	margin-top: 10px;
 }
 
-#ladder
-{	/*	There should be a 25px margin at the bottom of the word ladder													*/
-	margin-bottom: 25px;
-}
-
-#ladder:last-child
-{	/*	But the first rung of the ladder needs no margin																*/	
-	margin-top: 0px;
+#ladder-section
+{
+	padding: 5px;
 }
 
 .rung
 {	/*	There should be a 5px margin between each rung of the ladder													*/
+
 	display: flex;
 		flex-direction: row;
 		flex-wrap: nowrap;
 	margin-top: 5px;
 }
 
+.rung:first-child
+{	/*	But there should be no margin above the first rung.  It messes up the sticky footer								*/
+
+	margin-top: 0px;
+}
+
 .rung > *
 {	/*	There should be a 10px margin between the children of each rung													*/
+
 	flex-grow: 0;
 	flex-shrink: 0;
 	margin-right: 10px;
-}
-
-.rung:last-child
-{	/*	But the last child needs no margin																				*/
-	margin-right: 0px;
 }
 
 .rung > .number
@@ -102,6 +100,7 @@ textarea.background
 {
 	flex-grow: 1;
 	flex-shrink: 0;
+	margin-right: 0px;
 	width: 200px;
 }
 
